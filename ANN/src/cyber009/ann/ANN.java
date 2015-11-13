@@ -43,16 +43,14 @@ public class ANN {
         return 1.0000001/(1.0000001 + Math.exp(-a));
     }
     
-    public double calOutput(int dataSetindex) {
-        double sum =0.0;
-        for(int i = 0; i<=v.N; i++) {
-            sum += (v.X[dataSetindex][i] * v.WEIGHT[i]);
+    public double tanH(double a) {
+        double v =Math.tanh(a);
+        if(v==Double.NaN) {
+            return 0.0;
         }
-        
-        //return threshold(sum);
-//        return logistic((sum));
-        return sum;
+        return v;        
     }
+    
     
     public double calOutput(int dataSetindex, int mode) {
         double sum =0.0;
@@ -63,7 +61,9 @@ public class ANN {
             return threshold(sum);
         } else if(mode==2){
             return logistic((sum));            
-        } 
+        } else if(mode==3) {
+            return tanH(sum);
+        }
         return sum;
     }
     
@@ -72,71 +72,7 @@ public class ANN {
     }
     
     public long gradientDescent(long itaration) {
-        Random rand = new Random(System.currentTimeMillis());
-        double []deltaW = new double[v.N+1];
-        double []tempW = new double[v.N+1];
-        double totalError = 0.0, temp;
-        long count = 0;
-        int i, d;
-        boolean changeWeight = false;
-        boolean unMatch = false;
-        // small random value set to weight
-        for(i=0; i<=v.N; i++) {
-            v.WEIGHT[i] = Math.abs(rand.nextDouble());
-            v.WEIGHT[i] = (double) v.WEIGHT[i] - Math.floor(v.WEIGHT[i]);
-        }        
-        do {
-            for(i= 0; i<=v.N; i++) {
-                tempW[i] = v.WEIGHT[i];
-            }
-            for(i=0; i<=v.N; i++) {
-                deltaW[i] = 0;
-                for(d=0; d<v.D; d++) {
-                    deltaW[i] += learnRate * 
-                            ( v.TARGET[d] - (calOutput(d))) *
-                            v.X[d][i];
-                }
-            }
-            for(i=0; i<=v.N; i++) {
-                v.WEIGHT[i] += deltaW[i];
-            }
-            
-            unMatch = false;
-            for(d=0; d<v.D; d++) {
-                if((calOutput(d))!= v.TARGET[d]) {
-                    unMatch = true;
-                    break;
-                }
-            }
-            
-            changeWeight = false;
-            for(i=0; i<=v.N; i++) {
-                if(tempW[i] != v.WEIGHT[i]) {
-                    changeWeight = true;
-                    break;
-                }
-            }
-            
-            count++;
-//            if(count%100000 == 0) {
-//                System.out.println("-----------Count: "+ count+"--------------");
-//                //v.showWEIGHT();
-//                //6v.showTable(0, 6);
-//                System.out.println("------------------------------------------");
-//            }
-//            if((count ==itaration) || (changeWeight==false) || (unMatch == false)) {
-//                System.out.println("End:"+count+ " (WeightChange:"+changeWeight+") (target!=output:"+unMatch+")");
-//            }
-            if((count >itaration)) { // some proble in NaN double data
-                break;
-            }
-        } while((changeWeight==true) && (unMatch == true));
-        //Weight = {3.2198905626106613E-4, 2.2335823691292756E-4, 3.59674533175504E-4 }
-//        System.out.println("---Final----Count: "+ count+"--------------");
-//        v.showWEIGHT();
-//        //v.showTable();
-//        System.out.println("------------------------------------------");
-        return count;
+        return gradientDescent(itaration, 0);
     }
     
     public long gradientDescent(long itaration, int mode) {
@@ -171,7 +107,7 @@ public class ANN {
             
             unMatch = false;
             for(d=0; d<v.D; d++) {
-                if((calOutput(d))!= v.TARGET[d]) {
+                if((calOutput(d, 0))!= v.TARGET[d]) {
                     unMatch = true;
                     break;
                 }
