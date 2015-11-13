@@ -1,0 +1,84 @@
+
+package cyber009.function;
+
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.matrix.Matrix;
+import weka.estimators.MultivariateGaussianEstimator;
+
+/**
+ *
+ * @author pavel
+ */
+public class Statistics {
+    
+    public static double getBiMultivariant(Instances ins, Matrix X) {
+        int k = ins.numAttributes()-1;        
+        double[][] means = new double[k][1];        
+        double [][] sd = new double[k][k];
+        for(int i=0; i<k; i++) {
+            means[i][0] = getMeans(ins, i);
+        }        
+        for(int r=0; r<k; r++) {
+            for(int c=0; c<k; c++) {
+                sd[r][c] = 0.0;
+                for (Instance data : ins) {
+                    sd[r][c] +=( (data.value(r)- means[r][0])*
+                            (data.value(c)- means[c][0]));
+//                    System.out.println("("+data.value(r)+"-"+ means[r][0]+") * ("+
+//                            data.value(c)+"-"+ means[c][0]+") = "+sd[r][c]);                    
+                }
+                sd[r][c] = (sd[r][c]/
+                              (double)((ins.size()>1?ins.size()-1:1.0)));                
+            }
+        }
+        //X = new Matrix(means);
+        Matrix mu = new Matrix(means);
+        Matrix sigma = new Matrix(sd);
+        Matrix xmu = X.minus(mu);
+        double det = sigma.det();
+        double constance = (1.0)/ (Math.sqrt(
+                                    Math.pow(2.00*Math.PI, k)*
+                                    det));
+        Matrix eM = (xmu.transpose().times(sigma.inverse().times(xmu)));
+        double exp = Math.exp((-1.0/2.0)*eM.get(0, 0));
+        double ret = constance*exp;
+        ret= (ret>1.0?1.0:ret);
+        System.out.println(ret);
+        return ret;
+    }
+    
+    public static double getMultivariantProbability(Instances ins, Matrix X) {
+        double[][] dataset = new double[ins.size()][ins.numAttributes()-1];
+        double[] means_1 = new double[ins.numAttributes()-1];
+        MultivariateGaussianEstimator mv = new MultivariateGaussianEstimator();
+        double[][] newData = X.transpose().getArrayCopy();//new double[] {  0.2, 0.1, 0.43, 0.29, 0.0 };
+        int i=0, j;
+        for (Instance data : ins) {
+            for(j=0; j<ins.numAttributes()-1; j++) {
+                dataset[i][j] = data.value(j);
+            }
+            i++;
+        }
+        double [] w = new double[ins.size()];
+        int t = ins.size();
+        double d = (double)1.0/t;
+        for(i=0; i<t; i++) {
+            w[i] = d;
+        }
+        mv.estimate(dataset,w);
+        //Matrix mv_means = new Matrix(mv.getMean(), 1);
+        //Matrix mv_cov = new Matrix(mv.getCovariance());    
+        //System.out.println(mv_means);
+       // System.out.println(mv_cov);
+        double ret = mv.getProbability(newData[0]);
+        System.out.println(ret);
+        return ret;
+    }
+    
+    public static double getMeans(Instances ins, int index) {
+        return ins.meanOrMode(index);
+    }
+    
+}
+ 
