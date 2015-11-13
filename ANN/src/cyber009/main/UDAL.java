@@ -27,52 +27,64 @@ import weka.gui.visualize.VisualizePanel;
  */
 public class UDAL {
     
-    public static void main(String[] args) {
-        Random r = new Random(System.currentTimeMillis());
-        Variable v = new Variable();
-        long timeStart=0, timeEnd=0;
-        ANN ann = new ANN(v, 0.014013);
-        for(int f=2; f<=2; f++) {
-            v.N = f;
-            v.D = 4000;
-            v.threshold = 0.0;
-            cyber009.function.LinearFunction func= new cyber009.function.LinearFunction(v.N);
-            v.X = new double[v.D][];
-            v.TARGET = new double[v.D];
-            v.WEIGHT = new double[v.N+1];
-            for(int d=0; d<v.D; d++) {
-                v.X[d] = new double[v.N+1];
-                v.X[d][0] = 1.0;
-                for(int n=1; n<=v.N; n++) {
-                    v.X[d][n] = r.nextGaussian();
-                }
-                v.TARGET[d] =func.syntacticFunction(v.X[d], v.threshold);
+    Random r;
+    Variable v;
+    ANN ann;
+    cyber009.function.LinearFunction func;
+    
+    public UDAL(double learnRate) {
+        r = new Random(System.currentTimeMillis());
+        v = new Variable();
+        ann = new ANN(v, learnRate);//0.014013);
+    }
+    
+    public void initUDAL(int f, int D) {
+        v.N = f;
+        v.D = D;
+        v.threshold = 0.0;
+        func = new cyber009.function.LinearFunction(v.N);
+        v.X = new double[v.D][];
+        v.TARGET = new double[v.D];
+        v.WEIGHT = new double[v.N+1];
+        for(int d=0; d<v.D; d++) {
+            v.X[d] = new double[v.N+1];
+            v.X[d][0] = 1.0;
+            for(int n=1; n<=v.N; n++) {
+                v.X[d][n] = r.nextGaussian();
             }
-
-
+            v.TARGET[d] =func.syntacticFunction(v.X[d], v.threshold);
+        }
+    }
+    
+    public static void main(String[] args) {
+        
+        UDAL udal = new UDAL(0.014013);
+        long timeStart=0, timeEnd=0;
+        for(int f=2; f<=2; f++) {
+            udal.initUDAL(4, 40);
 
             //v.showAll();
             //Lib.Utility.writeCSVDataSet("data/syn_data_x_"+v.N+"_d_"+v.D+".csv", v);
 
             List<Attribute> atts = new ArrayList<>();
-            Attribute [] att = new Attribute[v.N+2];
-            for(int i=0; i<=v.N; i++) {
+            Attribute [] att = new Attribute[udal.v.N+2];
+            for(int i=0; i<=udal.v.N; i++) {
                 att[i] = new Attribute("X"+i);
                 atts.add(att[i]);
             }
             List<String> classValus = new ArrayList<>();
             classValus.add("1.0");
             classValus.add("0.0");
-            att[v.N+1] = new Attribute("class", classValus);
-            atts.add(att[v.N+1]);
-            Instances dataSet = new Instances("Syn Data", (ArrayList<Attribute>) atts, v.D);
+            att[udal.v.N+1] = new Attribute("class", classValus);
+            atts.add(att[udal.v.N+1]);
+            Instances dataSet = new Instances("Syn Data", (ArrayList<Attribute>) atts, udal.v.D);
 
-            for(int d= 0; d<v.D; d++) {
-                Instance ins = new DenseInstance(v.N+2);
-                for(int i=0; i<=v.N; i++) {
-                    ins.setValue(atts.get(i), v.X[d][i]);
+            for(int d= 0; d<udal.v.D; d++) {
+                Instance ins = new DenseInstance(udal.v.N+2);
+                for(int i=0; i<=udal.v.N; i++) {
+                    ins.setValue(atts.get(i), udal.v.X[d][i]);
                 }
-                ins.setValue(atts.get(v.N+1), v.TARGET[d]);
+                ins.setValue(atts.get(udal.v.N+1), udal.v.TARGET[d]);
                 dataSet.add(ins);
             }
             //System.out.println(dataSet);
@@ -90,19 +102,19 @@ public class UDAL {
                 frame.getContentPane().add(vp, BorderLayout.CENTER);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
-                func.showCoefficients();
+                udal.func.showCoefficients();
             } catch (Exception ex) {
                 Logger.getLogger(MainSyntacticData.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            ann.weightReset();
+            udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
-            ann.gradientDescent(10000L, 3);
+            udal.ann.gradientDescent(10000L, 3);
             timeEnd = System.currentTimeMillis();
             //v.showTable();
             //v.showWEIGHT();
-            System.out.println("feature #:"+v.N+" time:("+ (timeEnd - timeStart) +")");
-            v.showResult();
+            System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
+            udal.v.showResult();
             //func.showCoefficients();
         }
     }
