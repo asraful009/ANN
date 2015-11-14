@@ -76,7 +76,8 @@ public class Statistics {
         return ret;
     }
     
-    public static double posteriorDistribution() {
+    public static double posteriorDistribution(Instance ins, Matrix weight, Matrix label) {
+        
         return 0.0;
     }
     

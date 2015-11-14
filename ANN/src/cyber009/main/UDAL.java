@@ -120,6 +120,8 @@ public class UDAL {
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
             udal.v.showResult();
+            
+            
         }
     }
 }
