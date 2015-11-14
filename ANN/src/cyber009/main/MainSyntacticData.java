@@ -97,7 +97,7 @@ public class MainSyntacticData {
 
             ann.weightReset();
             timeStart = System.currentTimeMillis();
-            ann.gradientDescent(10000L, 2);
+            ann.gradientDescent(10000L, 2, v.D);
             timeEnd = System.currentTimeMillis();
             //v.showTable();
             //v.showWEIGHT();

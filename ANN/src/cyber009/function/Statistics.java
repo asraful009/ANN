@@ -76,6 +76,10 @@ public class Statistics {
         return ret;
     }
     
+    public static double posteriorDistribution() {
+        return 0.0;
+    }
+    
     public static double getMeans(Instances ins, int index) {
         return ins.meanOrMode(index);
     }

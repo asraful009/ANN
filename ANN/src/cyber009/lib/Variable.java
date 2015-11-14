@@ -16,6 +16,7 @@ public class Variable {
     public double [][] X;
     public double [] WEIGHT;
     public double [] TARGET;
+    public boolean [] LABEL;
     
     public Variable() {
         
@@ -34,7 +35,7 @@ public class Variable {
         X = new double[N+1][];
         WEIGHT = new double[N+1];
         TARGET = new double[D];
-        
+        LABEL = new boolean[D+1];
         for(int i=0; i<=N; i++) {
             X[i] = new double[D];
         }

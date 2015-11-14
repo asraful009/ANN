@@ -72,10 +72,10 @@ public class ANN {
     }
     
     public long gradientDescent(long itaration) {
-        return gradientDescent(itaration, 0);
+        return gradientDescent(itaration, 0, v.D);
     }
     
-    public long gradientDescent(long itaration, int mode) {
+    public long gradientDescent(long itaration, int mode, int D) {
         Random rand = new Random(System.currentTimeMillis());
         double []deltaW = new double[v.N+1];
         double []tempW = new double[v.N+1];
@@ -95,7 +95,7 @@ public class ANN {
             }
             for(i=0; i<=v.N; i++) {
                 deltaW[i] = 0;
-                for(d=0; d<v.D; d++) {
+                for(d=0; d<D; d++) {
                     deltaW[i] += learnRate * 
                             ( v.TARGET[d] - (calOutput(d, mode))) *
                             v.X[d][i];
@@ -106,7 +106,7 @@ public class ANN {
             }
             
             unMatch = false;
-            for(d=0; d<v.D; d++) {
+            for(d=0; d<D; d++) {
                 if((calOutput(d, 0))!= v.TARGET[d]) {
                     unMatch = true;
                     break;
