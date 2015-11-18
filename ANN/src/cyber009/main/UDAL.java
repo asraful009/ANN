@@ -57,11 +57,30 @@ public class UDAL {
         }
     }
     
-    public void activeLearning(int s, int D) {
+    public Instances activeLearning(int s, int D) {
+        List<Attribute> atts = new ArrayList<>();
+        Attribute [] att = new Attribute[v.N+2];
+        for(int i=0; i<=v.N; i++) {
+            att[i] = new Attribute("X"+i);
+            atts.add(att[i]);
+        }
+        List<String> classValus = new ArrayList<>();
+        classValus.add("1.0");
+        classValus.add("0.0");
+        att[v.N+1] = new Attribute("class", classValus);
+        atts.add(att[v.N+1]);
+        Instances dataSet = new Instances("Syn Data "+s+ "-"+D, (ArrayList<Attribute>) atts, v.D);        
+        Instance ins = new DenseInstance(v.N+2);
         for(int d=s; d<(s+D); d++) {
             v.TARGET[d] =func.syntacticFunction(v.X[d], v.threshold);
             v.LABEL[d]=true;
+            for(int n = 0; n<v.N; n++) {
+                ins.setValue(atts.get(n), v.X[d][n]);
+            }
+            ins.setValue(atts.get(v.N+1), v.TARGET[d]);
+            dataSet.add(ins);
         }
+        return dataSet;
     }
     
     public void showData() {
@@ -115,10 +134,13 @@ public class UDAL {
         long timeStart=0, timeEnd=0;
         for(int f=2; f<=2; f++) {
             udal.initUDAL(4, 4000);
-            udal.activeLearning(0, 40);
+            Instances ins = udal.activeLearning(0, 40);
             udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
             udal.ann.gradientDescent(10000L, 3, 40);
+            statis.calMultiVariantMuSigma(ins);
+            System.out.println(statis.mu);
+            System.out.println(statis.sigma);
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
             udal.v.showResult();

@@ -12,8 +12,8 @@ import weka.estimators.MultivariateGaussianEstimator;
  */
 public class Statistics {
     
-    Matrix mu;
-    Matrix sigma;
+    public Matrix mu;
+    public Matrix sigma;
     
     public Statistics() {
         
