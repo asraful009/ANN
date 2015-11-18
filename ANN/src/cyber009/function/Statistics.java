@@ -12,6 +12,13 @@ import weka.estimators.MultivariateGaussianEstimator;
  */
 public class Statistics {
     
+    Matrix mu;
+    Matrix sigma;
+    
+    public Statistics() {
+        
+    }
+    
     public static double getBiMultivariant(Instances ins, Matrix X) {
         int k = ins.numAttributes()-1;        
         double[][] means = new double[k][1];        
@@ -76,7 +83,31 @@ public class Statistics {
         return ret;
     }
     
-    public static double posteriorDistribution(Instance ins, Matrix weight, Matrix label) {
+    public void calMultiVariantMuSigma(Instances ins) {
+        int k = ins.numAttributes()-1;        
+        double[][] means = new double[k][1];        
+        double [][] sd = new double[k][k];
+        for(int i=0; i<k; i++) {
+            means[i][0] = getMeans(ins, i);
+        }        
+        for(int r=0; r<k; r++) {
+            for(int c=0; c<k; c++) {
+                sd[r][c] = 0.0;
+                for (Instance data : ins) {
+                    sd[r][c] +=( (data.value(r)- means[r][0])*
+                            (data.value(c)- means[c][0]));
+//                    System.out.println("("+data.value(r)+"-"+ means[r][0]+") * ("+
+//                            data.value(c)+"-"+ means[c][0]+") = "+sd[r][c]);                    
+                }
+                sd[r][c] = (sd[r][c]/
+                              (double)((ins.size()>1?ins.size()-1:1.0)));                
+            }
+        }
+        mu = new Matrix(means);
+        sigma = new Matrix(sd);
+    }
+    
+    public static double posteriorDistribution(Matrix val) {
         
         return 0.0;
     }

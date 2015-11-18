@@ -6,6 +6,7 @@
 package cyber009.main;
 
 import cyber009.ann.ANN;
+import cyber009.function.Statistics;
 import cyber009.lib.Variable;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -110,6 +111,7 @@ public class UDAL {
     public static void main(String[] args) {
         
         UDAL udal = new UDAL(0.014013);
+        Statistics statis = new Statistics();
         long timeStart=0, timeEnd=0;
         for(int f=2; f<=2; f++) {
             udal.initUDAL(4, 4000);
