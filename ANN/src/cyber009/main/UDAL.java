@@ -19,6 +19,7 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.matrix.Matrix;
 import weka.gui.visualize.PlotData2D;
 import weka.gui.visualize.VisualizePanel;
 
@@ -59,27 +60,29 @@ public class UDAL {
     
     public Instances activeLearning(int s, int D) {
         List<Attribute> atts = new ArrayList<>();
-        Attribute [] att = new Attribute[v.N+2];
-        for(int i=0; i<=v.N; i++) {
+        Attribute [] att = new Attribute[v.N];
+        for(int i=0; i<v.N-1; i++) {
             att[i] = new Attribute("X"+i);
             atts.add(att[i]);
         }
         List<String> classValus = new ArrayList<>();
         classValus.add("1.0");
         classValus.add("0.0");
-        att[v.N+1] = new Attribute("class", classValus);
-        atts.add(att[v.N+1]);
-        Instances dataSet = new Instances("Syn Data "+s+ "-"+D, (ArrayList<Attribute>) atts, v.D);        
-        Instance ins = new DenseInstance(v.N+2);
+        att[v.N-1] = new Attribute("class", classValus);
+        atts.add(att[v.N-1]);
+        Instances dataSet = new Instances("Syn Data "+s+ "-"+D, (ArrayList<Attribute>) atts, D);        
+        
         for(int d=s; d<(s+D); d++) {
             v.TARGET[d] =func.syntacticFunction(v.X[d], v.threshold);
             v.LABEL[d]=true;
-            for(int n = 0; n<v.N; n++) {
-                ins.setValue(atts.get(n), v.X[d][n]);
+            Instance ins = new DenseInstance(v.N);
+            for(int n = 0; n<v.N-1; n++) {
+                ins.setValue(atts.get(n), v.X[d][n+1]);
             }
-            ins.setValue(atts.get(v.N+1), v.TARGET[d]);
+            ins.setValue(atts.get(v.N-1), v.TARGET[d]);
             dataSet.add(ins);
         }
+        //System.out.println("data\n"+ dataSet.toString());
         return dataSet;
     }
     
@@ -141,6 +144,15 @@ public class UDAL {
             statis.calMultiVariantMuSigma(ins);
             System.out.println(statis.mu);
             System.out.println(statis.sigma);
+            for(int d=0; d<udal.v.D; d++) {
+                if(udal.v.LABEL[d] == false) {
+                    double [][] val = new double[udal.v.N-1][1];
+                    for(int n=1; n<udal.v.N; n++) {
+                        val[n-1][0] = udal.v.X[d][n];
+                    }
+                    statis.posteriorDistribution(new Matrix(val));
+                }
+            }
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
             udal.v.showResult();

@@ -107,9 +107,20 @@ public class Statistics {
         sigma = new Matrix(sd);
     }
     
-    public static double posteriorDistribution(Matrix val) {
-        
-        return 0.0;
+    public double posteriorDistribution(Matrix val) {
+        int k = val.getRowDimension();
+        //System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
+        Matrix xmu = val.minus(mu);
+        double det = sigma.det();
+        double constance = (1.0)/ (Math.sqrt(
+                                    Math.pow(2.00*Math.PI, k)*
+                                    det));
+        Matrix eM = (xmu.transpose().times(sigma.inverse().times(xmu)));
+        double exp = Math.exp((-1.0/2.0)*eM.get(0, 0));
+        double ret = constance*exp;
+        ret= (ret>1.0?1.0:ret);
+        System.out.println(ret);
+        return ret;
     }
     
     public static double getMeans(Instances ins, int index) {
