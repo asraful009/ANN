@@ -1,6 +1,8 @@
 
 package cyber009.function;
 
+import cyber009.lib.Variable;
+import java.util.HashMap;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.matrix.Matrix;
@@ -12,11 +14,13 @@ import weka.estimators.MultivariateGaussianEstimator;
  */
 public class Statistics {
     
-    public Matrix mu;
-    public Matrix sigma;
-    
-    public Statistics() {
-        
+    public HashMap<Double, Matrix> mu;
+    public HashMap<Double, Matrix> sigma;
+    public Variable V;
+    public Statistics(Variable V) {
+        this.V = V;
+        mu = new HashMap<>();
+        sigma = new HashMap<>();
     }
     
     public static double getBiMultivariant(Instances ins, Matrix X) {
@@ -83,39 +87,45 @@ public class Statistics {
         return ret;
     }
     
-    public void calMultiVariantMuSigma(Instances ins) {
-        int k = ins.numAttributes()-1;        
-        double[][] means = new double[k][1];        
+    public void calMultiVariantMuSigma(double target) {
+        int k = V.N;
+        int count = 0;
+        double[][] means = new double[k][1];
         double [][] sd = new double[k][k];
         for(int i=0; i<k; i++) {
-            means[i][0] = getMeans(ins, i);
-        }        
+            means[i][0] = getMeans(target, i);
+        }      
         for(int r=0; r<k; r++) {
             for(int c=0; c<k; c++) {
                 sd[r][c] = 0.0;
-                for (Instance data : ins) {
-                    sd[r][c] +=( (data.value(r)- means[r][0])*
-                            (data.value(c)- means[c][0]));
+                count = 0;
+                for (int d=0; d<V.D; d++) {
+                    if(V.TARGET[d]==target && V.LABEL[d]==true) {
+                        sd[r][c] +=( (V.X[d][r]- means[r][0])*
+                                (V.X[d][r]- means[c][0]));
+                        count++;
 //                    System.out.println("("+data.value(r)+"-"+ means[r][0]+") * ("+
 //                            data.value(c)+"-"+ means[c][0]+") = "+sd[r][c]);                    
+                    }
                 }
                 sd[r][c] = (sd[r][c]/
-                              (double)((ins.size()>1?ins.size()-1:1.0)));                
+                       (double)((count>0?count:1.0)));                
+                
             }
         }
-        mu = new Matrix(means);
-        sigma = new Matrix(sd);
+        mu.put(target, new Matrix(means));
+        sigma.put(target, new Matrix(sd));
     }
     
-    public double posteriorDistribution(Matrix val) {
+    public double posteriorDistribution(double target, Matrix val) {
         int k = val.getRowDimension();
         //System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
-        Matrix xmu = val.minus(mu);
-        double det = sigma.det();
+        Matrix xmu = val.minus(mu.get(target));
+        double det = sigma.get(target).det();
         double constance = (1.0)/ (Math.sqrt(
                                     Math.pow(2.00*Math.PI, k)*
                                     det));
-        Matrix eM = (xmu.transpose().times(sigma.inverse().times(xmu)));
+        Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));
         double exp = Math.exp((-1.0/2.0)*eM.get(0, 0));
         double ret = constance*exp;
         ret= (ret>1.0?1.0:ret);
@@ -127,5 +137,21 @@ public class Statistics {
         return ins.meanOrMode(index);
     }
     
+    
+    public double getMeans(double target, int index) {
+        double sum = 0.0;
+        int count = 0;
+        for(int d=0; d<V.D; d++) {
+            if(V.TARGET[d]== target && V.LABEL[d]==true) {
+                sum +=V.X[d][index];
+                count++;
+            }
+        }
+        if(count==0) {
+            return 0.0;
+        }
+        sum /=(double) count;
+        return sum;
+    }
 }
  

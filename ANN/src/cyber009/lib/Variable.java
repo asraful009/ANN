@@ -5,6 +5,9 @@
  */
 package cyber009.lib;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  * @author pavel
@@ -17,9 +20,10 @@ public class Variable {
     public double [] WEIGHT;
     public double [] TARGET;
     public boolean [] LABEL;
+    public List<Double> CLASSES;
     
     public Variable() {
-        
+        CLASSES = new LinkedList<>();
     }
     
     public Variable(int N) {
@@ -27,11 +31,13 @@ public class Variable {
         X = new double[N+1][];
         WEIGHT = new double[N+1];        
         WEIGHT[0] = 1.0;
+        CLASSES = new LinkedList<>();
     }
     
     public Variable(int N, int D) {
         this.N = N;
         this.D = D;
+        CLASSES = new LinkedList<>();
         X = new double[N+1][];
         WEIGHT = new double[N+1];
         TARGET = new double[D];
