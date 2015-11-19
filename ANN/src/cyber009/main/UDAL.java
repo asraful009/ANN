@@ -111,8 +111,7 @@ public class UDAL {
 
     }
     
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) {        
         UDAL udal = new UDAL(0.014013);
         Statistics statis = new Statistics(udal.v);
         long timeStart=0, timeEnd=0;
@@ -122,17 +121,20 @@ public class UDAL {
             udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
             udal.ann.gradientDescent(10000L, 3, 40);
-            //for()
-            //statis.calMultiVariantMuSigma();
-            System.out.println(statis.mu);
-            System.out.println(statis.sigma);
-            for(int d=0; d<udal.v.D; d++) {
-                if(udal.v.LABEL[d] == false) {
-                    double [][] val = new double[udal.v.N-1][1];
-                    for(int n=1; n<udal.v.N; n++) {
-                        val[n-1][0] = udal.v.X[d][n];
+            for (Double target : udal.v.CLASSES) {
+                System.err.println("target :"+ target);
+                statis.calMultiVariantMuSigma(target);
+                //statis.calMultiVariantMuSigma();
+                System.out.println(statis.mu.get(target));
+                System.out.println(statis.sigma.get(target));
+                for(int d=0; d<udal.v.D; d++) {
+                    if(udal.v.LABEL[d] == false) {
+                        double [][] val = new double[udal.v.N-1][1];
+                        for(int n=1; n<udal.v.N; n++) {
+                            val[n-1][0] = udal.v.X[d][n];
+                        }
+                        statis.posteriorDistribution(target, new Matrix(val));
                     }
-                    statis.posteriorDistribution(new Matrix(val));
                 }
             }
             timeEnd = System.currentTimeMillis();

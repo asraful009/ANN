@@ -27,11 +27,6 @@ public class MainLMV {
             // Make the last attribute be the class
             instances.setClassIndex(instances.numAttributes() - 1);
             double [][] test = new double[][]{{ 0.05}, {0.01}, {0.43}, {0.29}, {0.56}};
-            Statistics s = new Statistics();
-            s.calMultiVariantMuSigma(instances);
-            System.out.println(s.mu);
-            System.out.println(s.sigma);
-            
             Statistics.getBiMultivariant(instances, new Matrix(test));            
             
             Statistics.getMultivariantProbability(instances, new Matrix(test));
