@@ -139,9 +139,9 @@ public class UDAL {
                 System.out.println(statis.sigma.get(target));
                 for(int d=0; d<udal.v.D; d++) {
                     if(udal.v.LABEL[d] == false) {
-                        double [][] val = new double[udal.v.N][1];
-                        for(int n=0; n<udal.v.N; n++) {
-                            val[n][0] = udal.v.X[d][n];
+                        double [][] val = new double[udal.v.N-1][1];
+                        for(int n=1; n<udal.v.N; n++) {
+                            val[n-1][0] = udal.v.X[d][n];
                         }
                         statis.posteriorDistribution(target, new Matrix(val));
                     }

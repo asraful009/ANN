@@ -88,7 +88,7 @@ public class Statistics {
     }
     
     public void calMultiVariantMuSigma(double target) {
-        int k = V.N;
+        int k = V.N-1;
         int count = 0;
         double[][] means = new double[k][1];
         double [][] sd = new double[k][k];
@@ -101,8 +101,8 @@ public class Statistics {
                 count = 0;
                 for (int d=0; d<V.D; d++) {
                     if(V.TARGET[d]==target && V.LABEL[d]==true) {
-                        sd[r][c] +=( (V.X[d][r]- means[r][0])*
-                                (V.X[d][r]- means[c][0]));
+                        sd[r][c] +=( (V.X[d][r+1]- means[r][0])*
+                                (V.X[d][r+1]- means[c][0]));
                         count++;
 //                    System.out.println("("+data.value(r)+"-"+ means[r][0]+") * ("+
 //                            data.value(c)+"-"+ means[c][0]+") = "+sd[r][c]);                    
