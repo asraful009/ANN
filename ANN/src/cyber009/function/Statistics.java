@@ -118,8 +118,9 @@ public class Statistics {
     }
     
     public double posteriorDistribution(double target, Matrix val) {
+        
         int k = val.getRowDimension();
-        //System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
+        System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
         Matrix xmu = val.minus(mu.get(target));
         double det = sigma.get(target).det();
         double constance = (1.0)/ (Math.sqrt(

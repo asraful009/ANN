@@ -10,6 +10,7 @@ import cyber009.function.Statistics;
 import cyber009.lib.Variable;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -61,10 +62,20 @@ public class UDAL {
     public void activeLearning(int s, int D) {
         for(int d=s; d<(s+D); d++) {
             v.TARGET[d] =func.syntacticFunction(v.X[d], v.threshold);
-            v.CLASSES.add(v.TARGET[d]);
+            if(isClassHave(v.TARGET[d]) == false) {
+                v.CLASSES.add(v.TARGET[d]);
+            }
             v.LABEL[d]=true;            
+        }       
+    }
+    
+    public boolean isClassHave(Double CLASS) {
+        for (Double target : v.CLASSES ) {
+            if(target.equals(CLASS)) {
+                return true;
+            }
         }
-       
+        return false;
     }
     
     public void showData() {
@@ -122,20 +133,20 @@ public class UDAL {
             timeStart = System.currentTimeMillis();
             udal.ann.gradientDescent(10000L, 3, 40);
             for (Double target : udal.v.CLASSES) {
-                System.err.println("target :"+ target);
                 statis.calMultiVariantMuSigma(target);
-                //statis.calMultiVariantMuSigma();
+                System.out.println("-----------------------\nClass:"+ target);
                 System.out.println(statis.mu.get(target));
                 System.out.println(statis.sigma.get(target));
                 for(int d=0; d<udal.v.D; d++) {
                     if(udal.v.LABEL[d] == false) {
-                        double [][] val = new double[udal.v.N-1][1];
-                        for(int n=1; n<udal.v.N; n++) {
-                            val[n-1][0] = udal.v.X[d][n];
+                        double [][] val = new double[udal.v.N][1];
+                        for(int n=0; n<udal.v.N; n++) {
+                            val[n][0] = udal.v.X[d][n];
                         }
                         statis.posteriorDistribution(target, new Matrix(val));
                     }
                 }
+                System.out.println("-----------------------");
             }
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
