@@ -128,27 +128,28 @@ public class UDAL {
         long timeStart=0, timeEnd=0;
         for(int f=2; f<=2; f++) {
             udal.initUDAL(4, 4000);
-            udal.activeLearning(0, 40);
+            udal.activeLearning(0, 100);
             udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
-            udal.ann.gradientDescent(10000L, 3, 40);
-            
+            udal.ann.gradientDescent(10000L, 3, 100);
+            for (Double target : udal.v.CLASSES) {
+                statis.calMultiVariantMuSigma(target);
+                System.out.println(statis.mu.get(target));
+                System.out.println(statis.sigma.get(target));
+            }
             for(int d=0; d<udal.v.D; d++) {
                 if(udal.v.LABEL[d] == false) {
                     double [][] val = new double[udal.v.N-1][1];
                     for(int n=1; n<udal.v.N; n++) {
                         val[n-1][0] = udal.v.X[d][n];
-                        System.out.print(udal.v.X[d][n] + "   ");
-                        System.out.println(val[n-1][0]);
+//                        System.out.print(udal.v.X[d][n] + "   ");
+//                        System.out.println(val[n-1][0]);
                     }
-                    //System.exit(0);
                     for (Double target : udal.v.CLASSES) {
-                        statis.calMultiVariantMuSigma(target);
                         System.out.println("-----------------------\nClass:"+ target);
-                        System.out.println(statis.mu.get(target));
-                        System.out.println(statis.sigma.get(target));
                         statis.posteriorDistribution(target, new Matrix(val));
                     }
+                    
                 }
             }
             System.out.println("-----------------------");

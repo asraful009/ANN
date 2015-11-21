@@ -126,13 +126,23 @@ public class Statistics {
         double constance = (1.0)/ (Math.sqrt(
                                     Math.pow(2.00*Math.PI, (double)k)*
                                     det));
-        Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));
-        double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
-        double ret = constance*exp;
-        System.out.println(ret);
-        ret= (ret>1.0?1.0:ret);
-        //System.out.println(ret);
-        return ret;
+        try {
+            Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));            
+            double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
+            double ret = constance*exp;
+            System.out.println(ret);
+            if (ret == Double.NaN) 
+                return 0.0D;
+            if (ret == Double.POSITIVE_INFINITY) {
+                return 1.0D;
+            }
+            ret= (ret>1.0?1.0:ret);
+            //System.out.println(ret);
+            return ret;
+        } catch (Exception e) {
+            //System.err.println("asasa");
+            return 0.0D;
+        }
     }
     
     public static double getMeans(Instances ins, int index) {
