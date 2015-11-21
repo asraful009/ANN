@@ -48,7 +48,7 @@ public class UDAL {
         func = new cyber009.function.LinearFunction(v.N);
         v.X = new double[v.D][];
         v.TARGET = new double[v.D];
-        v.WEIGHT = new double[v.N];
+        v.WEIGHT = new double[v.N+1];
         v.LABEL = new boolean[D];
         for(int d=0; d<v.D; d++) {
             v.X[d] = new double[v.N];

@@ -54,8 +54,8 @@ public class ANN {
     
     public double calOutput(int dataSetindex, int mode) {
         double sum =1.0D * v.WEIGHT[0];
-        for(int i = 1; i<v.N; i++) {
-            sum += (v.X[dataSetindex][i] * v.WEIGHT[i]);
+        for(int i = 0; i<v.N; i++) {
+            sum += (v.X[dataSetindex][i] * v.WEIGHT[i+1]);
         }
         if(mode==1) {
             return threshold(sum);
@@ -85,23 +85,23 @@ public class ANN {
         boolean changeWeight = false;
         boolean unMatch = false;
         // small random value set to weight
-        for(i=0; i<v.N; i++) {
+        for(i=0; i<=v.N; i++) { // all weight
             v.WEIGHT[i] = Math.abs(rand.nextDouble());
             v.WEIGHT[i] = (double) v.WEIGHT[i] - Math.floor(v.WEIGHT[i]);
         }        
         do {
-            for(i= 0; i<v.N; i++) {
+            for(i= 0; i<=v.N; i++) { // all weight
                 tempW[i] = v.WEIGHT[i];
             }
-            for(i=0; i<v.N; i++) {
+            for(i=0; i<=v.N; i++) {
                 deltaW[i] = 0;
                 for(d=0; d<D; d++) {
                     deltaW[i] += learnRate * 
                             ( v.TARGET[d] - (calOutput(d, mode))) *
-                            v.X[d][i];
+                            (i==0?1.0D:v.X[d][i-1]); // x0 = 1 
                 }
             }
-            for(i=0; i<v.N; i++) {
+            for(i=0; i<=v.N; i++) {
                 v.WEIGHT[i] += deltaW[i];
             }
             
@@ -114,7 +114,7 @@ public class ANN {
             }
             
             changeWeight = false;
-            for(i=0; i<v.N; i++) {
+            for(i=0; i<=v.N; i++) { // all weight
                 if(tempW[i] != v.WEIGHT[i]) {
                     changeWeight = true;
                     break;
@@ -143,7 +143,7 @@ public class ANN {
         return count;
     }
     
-    public void weightFindMatrix() {
+    public void weightFindMatrix() { // proble in x0 
         Matrix X = new Matrix(v.X);
         Matrix Y = new Matrix(v.D, 1);
         Matrix W = new Matrix(v.N, 1);
@@ -164,7 +164,7 @@ public class ANN {
         temp = temp.times(Y);
         //System.out.println(temp.toString());
         W = temp;
-        for(int n=0; n<v.N; n++) {
+        for(int n=0; n<=v.N; n++) {
             v.WEIGHT[n] = W.get(n, 0);
         }
         //System.out.println(YI.toString());
@@ -173,7 +173,7 @@ public class ANN {
     
     
     public void weightReset() {
-        for(int i=0; i<v.N; i++) {
+        for(int i=0; i<=v.N; i++) {
             v.WEIGHT[i] = 0.0;
         }
     }
