@@ -53,8 +53,8 @@ public class ANN {
     
     
     public double calOutput(int dataSetindex, int mode) {
-        double sum =0.0;
-        for(int i = 0; i<=v.N; i++) {
+        double sum =1.0D * v.WEIGHT[0];
+        for(int i = 1; i<v.N; i++) {
             sum += (v.X[dataSetindex][i] * v.WEIGHT[i]);
         }
         if(mode==1) {
@@ -77,23 +77,23 @@ public class ANN {
     
     public long gradientDescent(long itaration, int mode, int D) {
         Random rand = new Random(System.currentTimeMillis());
-        double []deltaW = new double[v.N+1];
-        double []tempW = new double[v.N+1];
+        double []deltaW = new double[v.N];
+        double []tempW = new double[v.N];
         double totalError = 0.0, temp;
         long count = 0;
         int i, d;
         boolean changeWeight = false;
         boolean unMatch = false;
         // small random value set to weight
-        for(i=0; i<=v.N; i++) {
+        for(i=0; i<v.N; i++) {
             v.WEIGHT[i] = Math.abs(rand.nextDouble());
             v.WEIGHT[i] = (double) v.WEIGHT[i] - Math.floor(v.WEIGHT[i]);
         }        
         do {
-            for(i= 0; i<=v.N; i++) {
+            for(i= 0; i<v.N; i++) {
                 tempW[i] = v.WEIGHT[i];
             }
-            for(i=0; i<=v.N; i++) {
+            for(i=0; i<v.N; i++) {
                 deltaW[i] = 0;
                 for(d=0; d<D; d++) {
                     deltaW[i] += learnRate * 
@@ -101,7 +101,7 @@ public class ANN {
                             v.X[d][i];
                 }
             }
-            for(i=0; i<=v.N; i++) {
+            for(i=0; i<v.N; i++) {
                 v.WEIGHT[i] += deltaW[i];
             }
             
@@ -114,7 +114,7 @@ public class ANN {
             }
             
             changeWeight = false;
-            for(i=0; i<=v.N; i++) {
+            for(i=0; i<v.N; i++) {
                 if(tempW[i] != v.WEIGHT[i]) {
                     changeWeight = true;
                     break;
@@ -164,7 +164,7 @@ public class ANN {
         temp = temp.times(Y);
         //System.out.println(temp.toString());
         W = temp;
-        for(int n=0; n<=v.N; n++) {
+        for(int n=0; n<v.N; n++) {
             v.WEIGHT[n] = W.get(n, 0);
         }
         //System.out.println(YI.toString());

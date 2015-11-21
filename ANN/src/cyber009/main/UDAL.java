@@ -48,12 +48,12 @@ public class UDAL {
         func = new cyber009.function.LinearFunction(v.N);
         v.X = new double[v.D][];
         v.TARGET = new double[v.D];
-        v.WEIGHT = new double[v.N+1];
-        v.LABEL = new boolean[D+1];
+        v.WEIGHT = new double[v.N];
+        v.LABEL = new boolean[D];
         for(int d=0; d<v.D; d++) {
-            v.X[d] = new double[v.N+1];
+            v.X[d] = new double[v.N];
             v.X[d][0] = 1.0;
-            for(int n=1; n<=v.N; n++) {
+            for(int n=0; n<v.N; n++) {
                 v.X[d][n] = r.nextGaussian();
             }            
         }
@@ -80,24 +80,24 @@ public class UDAL {
     
     public void showData() {
         List<Attribute> atts = new ArrayList<>();
-            Attribute [] att = new Attribute[v.N+2];
-            for(int i=0; i<=v.N; i++) {
+            Attribute [] att = new Attribute[v.N+1];
+            for(int i=0; i<v.N; i++) {
                 att[i] = new Attribute("X"+i);
                 atts.add(att[i]);
             }
             List<String> classValus = new ArrayList<>();
             classValus.add("1.0");
             classValus.add("0.0");
-            att[v.N+1] = new Attribute("class", classValus);
-            atts.add(att[v.N+1]);
+            att[v.N] = new Attribute("class", classValus);
+            atts.add(att[v.N]);
             Instances dataSet = new Instances("Syn Data", (ArrayList<Attribute>) atts, v.D);
 
             for(int d= 0; d<v.D; d++) {
-                Instance ins = new DenseInstance(v.N+2);
-                for(int i=0; i<=v.N; i++) {
+                Instance ins = new DenseInstance(v.N+1);
+                for(int i=0; i<v.N; i++) {
                     ins.setValue(atts.get(i), v.X[d][i]);
                 }
-                ins.setValue(atts.get(v.N+1), v.TARGET[d]);
+                ins.setValue(atts.get(v.N), v.TARGET[d]);
                 dataSet.add(ins);
             }
             //System.out.println(dataSet);
@@ -135,8 +135,8 @@ public class UDAL {
             
             for(int d=0; d<udal.v.D; d++) {
                 if(udal.v.LABEL[d] == false) {
-                    double [][] val = new double[udal.v.N-1][1];
-                    for(int n=1; n<udal.v.N; n++) {
+                    double [][] val = new double[udal.v.N][1];
+                    for(int n=0; n<udal.v.N; n++) {
                         val[n-1][0] = udal.v.X[d][n];
                         System.out.print(udal.v.X[d][n] + "   ");
                         System.out.println(val[n-1][0]);
