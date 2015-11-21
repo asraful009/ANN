@@ -65,6 +65,7 @@ public class UDAL {
             if(isClassHave(v.TARGET[d]) == false) {
                 v.CLASSES.add(v.TARGET[d]);
             }
+            v.N_DATA_IN_CLASS.put(v.TARGET[d] , v.N_DATA_IN_CLASS.getOrDefault(v.TARGET[d], 1)+1);
             v.LABEL[d]=true;            
         }       
     }
@@ -134,6 +135,7 @@ public class UDAL {
             udal.ann.gradientDescent(10000L, 3, 100);
             for (Double target : udal.v.CLASSES) {
                 statis.calMultiVariantMuSigma(target);
+                System.out.println(udal.v.N_DATA_IN_CLASS.get(target));
                 System.out.println(statis.mu.get(target));
                 System.out.println(statis.sigma.get(target));
             }

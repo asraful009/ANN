@@ -5,6 +5,7 @@
  */
 package cyber009.lib;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,10 +21,12 @@ public class Variable {
     public double [] WEIGHT;
     public double [] TARGET;
     public boolean [] LABEL;
-    public List<Double> CLASSES;
+    public List<Double> CLASSES;    
+    public HashMap<Double, Integer> N_DATA_IN_CLASS;
     
     public Variable() {
         CLASSES = new LinkedList<>();
+        N_DATA_IN_CLASS = new HashMap<>();
     }
     
     public Variable(int N) {

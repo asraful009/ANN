@@ -3,6 +3,8 @@ package cyber009.function;
 
 import cyber009.lib.Variable;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.matrix.Matrix;
@@ -21,6 +23,7 @@ public class Statistics {
         this.V = V;
         mu = new HashMap<>();
         sigma = new HashMap<>();
+        
     }
     
     public static double getBiMultivariant(Instances ins, Matrix X) {
@@ -136,7 +139,7 @@ public class Statistics {
             if (ret == Double.POSITIVE_INFINITY) {
                 return 1.0D;
             }
-            ret= (ret>1.0?1.0:ret);
+            ret= (ret>1.0D?1.0D:ret);
             //System.out.println(ret);
             return ret;
         } catch (Exception e) {
