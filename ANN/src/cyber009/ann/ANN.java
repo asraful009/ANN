@@ -53,9 +53,9 @@ public class ANN {
     
     
     public double calOutput(int dataSetindex, int mode) {
-        double sum =1.0D * v.WEIGHT[0];
-        for(int i = 0; i<v.N; i++) {
-            sum += (v.X[dataSetindex][i] * v.WEIGHT[i+1]);
+        double sum =0.0;
+        for(int i = 0; i<=v.N; i++) {
+            sum += (v.X[dataSetindex][i] * v.WEIGHT[i]);
         }
         if(mode==1) {
             return threshold(sum);
@@ -77,8 +77,8 @@ public class ANN {
     
     public long gradientDescent(long itaration, int mode, int D) {
         Random rand = new Random(System.currentTimeMillis());
-        double []deltaW = new double[v.N];
-        double []tempW = new double[v.N];
+        double []deltaW = new double[v.N+1];
+        double []tempW = new double[v.N+1];
         double totalError = 0.0, temp;
         long count = 0;
         int i, d;
@@ -98,7 +98,7 @@ public class ANN {
                 for(d=0; d<D; d++) {
                     deltaW[i] += learnRate * 
                             ( v.TARGET[d] - (calOutput(d, mode))) *
-                            (i==0?1.0D:v.X[d][i-1]); // x0 = 1 
+                            v.X[d][i];
                 }
             }
             for(i=0; i<=v.N; i++) {
@@ -143,7 +143,7 @@ public class ANN {
         return count;
     }
     
-    public void weightFindMatrix() { // proble in x0 
+    public void weightFindMatrix() {
         Matrix X = new Matrix(v.X);
         Matrix Y = new Matrix(v.D, 1);
         Matrix W = new Matrix(v.N, 1);
@@ -173,7 +173,7 @@ public class ANN {
     
     
     public void weightReset() {
-        for(int i=0; i<=v.N; i++) {
+        for(int i=0; i<v.N; i++) {
             v.WEIGHT[i] = 0.0;
         }
     }
