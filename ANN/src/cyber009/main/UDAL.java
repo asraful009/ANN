@@ -132,22 +132,26 @@ public class UDAL {
             udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
             udal.ann.gradientDescent(10000L, 3, 40);
-            for (Double target : udal.v.CLASSES) {
-                statis.calMultiVariantMuSigma(target);
-                System.out.println("-----------------------\nClass:"+ target);
-                System.out.println(statis.mu.get(target));
-                System.out.println(statis.sigma.get(target));
-                for(int d=0; d<udal.v.D; d++) {
-                    if(udal.v.LABEL[d] == false) {
-                        double [][] val = new double[udal.v.N-1][1];
-                        for(int n=1; n<udal.v.N; n++) {
-                            val[n-1][0] = udal.v.X[d][n];
-                        }
+            
+            for(int d=0; d<udal.v.D; d++) {
+                if(udal.v.LABEL[d] == false) {
+                    double [][] val = new double[udal.v.N-1][1];
+                    for(int n=1; n<udal.v.N; n++) {
+                        val[n-1][0] = udal.v.X[d][n];
+                        System.out.print(udal.v.X[d][n] + "   ");
+                        System.out.println(val[n-1][0]);
+                    }
+                    //System.exit(0);
+                    for (Double target : udal.v.CLASSES) {
+                        statis.calMultiVariantMuSigma(target);
+                        System.out.println("-----------------------\nClass:"+ target);
+                        System.out.println(statis.mu.get(target));
+                        System.out.println(statis.sigma.get(target));
                         statis.posteriorDistribution(target, new Matrix(val));
                     }
                 }
-                System.out.println("-----------------------");
             }
+            System.out.println("-----------------------");
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
             udal.v.showResult();

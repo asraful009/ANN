@@ -88,12 +88,12 @@ public class Statistics {
     }
     
     public void calMultiVariantMuSigma(double target) {
-        int k = V.N-1;
+        int k = V.N;
         int count = 0;
-        double[][] means = new double[k][1];
-        double [][] sd = new double[k][k];
+        double[][] means = new double[k-1][1];
+        double [][] sd = new double[k-1][k];
         for(int i=0; i<k; i++) {
-            means[i][0] = getMeans(target, i);
+            means[i][0] = getMeans(target, i+1);
         }      
         for(int r=0; r<k; r++) {
             for(int c=0; c<k; c++) {
@@ -124,13 +124,14 @@ public class Statistics {
         Matrix xmu = val.minus(mu.get(target));
         double det = sigma.get(target).det();
         double constance = (1.0)/ (Math.sqrt(
-                                    Math.pow(2.00*Math.PI, k)*
+                                    Math.pow(2.00*Math.PI, (double)k)*
                                     det));
         Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));
-        double exp = Math.exp((-1.0/2.0)*eM.get(0, 0));
+        double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
         double ret = constance*exp;
-        ret= (ret>1.0?1.0:ret);
         System.out.println(ret);
+        ret= (ret>1.0?1.0:ret);
+        //System.out.println(ret);
         return ret;
     }
     
