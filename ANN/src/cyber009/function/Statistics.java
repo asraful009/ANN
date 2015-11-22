@@ -133,7 +133,7 @@ public class Statistics {
             Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));            
             double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
             ret = constance*exp;
-            System.out.println(ret);
+            //System.out.println(ret);
             if (ret == Double.NaN) 
                 ret = 0.0D;
             if (ret == Double.POSITIVE_INFINITY) {
@@ -145,6 +145,10 @@ public class Statistics {
         ret *= (double)V.N_DATA_IN_CLASS.getOrDefault(target, 0);
         ret= (ret>1.0D?1.0D:ret);
         return ret;
+    }
+    
+    public double conditionalEntropy(double target, Matrix val) {
+        return 0.0D;
     }
     
     public static double getMeans(Instances ins, int index) {

@@ -146,10 +146,12 @@ public class UDAL {
 //                        System.out.print(udal.v.X[d][n] + "   ");
 //                        System.out.println(val[n-1][0]);
                     }
+                    double pp = 0.0D;
                     for (Double target : udal.v.CLASSES) {
-                        System.out.println("-----------------------\nClass:"+ target);
-                        statis.posteriorDistribution(target, new Matrix(val));
+                        //System.out.println("-----------------------\nClass:"+ target);
+                        pp += statis.posteriorDistribution(target, new Matrix(val));
                     }
+                    System.out.print("Sum posterior:"+ pp+ " for "+new Matrix(val).transpose());
                     
                 }
             }
