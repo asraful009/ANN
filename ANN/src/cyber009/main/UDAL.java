@@ -10,7 +10,6 @@ import cyber009.function.Statistics;
 import cyber009.lib.Variable;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -65,7 +64,7 @@ public class UDAL {
             if(isClassHave(v.TARGET[d]) == false) {
                 v.CLASSES.add(v.TARGET[d]);
             }
-            v.N_DATA_IN_CLASS.put(v.TARGET[d] , v.N_DATA_IN_CLASS.getOrDefault(v.TARGET[d], 1)+1);
+            v.N_DATA_IN_CLASS.put(v.TARGET[d] , v.N_DATA_IN_CLASS.getOrDefault(v.TARGET[d], 0)+1);
             v.LABEL[d]=true;            
         }       
     }

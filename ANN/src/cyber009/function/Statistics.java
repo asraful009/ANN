@@ -103,12 +103,12 @@ public class Statistics {
                 sd[r][c] = 0.0;
                 count = 0;
                 for (int d=0; d<V.D; d++) {
-                    if(V.TARGET[d]==target && V.LABEL[d]==true) {
+                    if(V.TARGET[d] == target && V.LABEL[d]==true) {
                         sd[r][c] +=( (V.X[d][r+1]- means[r][0])*
-                                (V.X[d][r+1]- means[c][0]));
+                                (V.X[d][c+1]- means[c][0]));
                         count++;
-//                    System.out.println("("+data.value(r)+"-"+ means[r][0]+") * ("+
-//                            data.value(c)+"-"+ means[c][0]+") = "+sd[r][c]);                    
+//                    System.out.println("("+V.X[d][r+1]+"-("+ means[r][0]+")) * (("+
+//                            V.X[d][c+1]+")-("+ means[c][0]+")) = "+sd[r][c]);                    
                     }
                 }
                 sd[r][c] = (sd[r][c]/
@@ -120,10 +120,10 @@ public class Statistics {
         sigma.put(target, new Matrix(sd));
     }
     
-    public double posteriorDistribution(double target, Matrix val) {
-        
+    public double posteriorDistribution(double target, Matrix val) {        
         int k = val.getRowDimension();
-        System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
+        double ret = 0.0D;
+        //System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
         Matrix xmu = val.minus(mu.get(target));
         double det = sigma.get(target).det();
         double constance = (1.0)/ (Math.sqrt(
@@ -132,20 +132,19 @@ public class Statistics {
         try {
             Matrix eM = (xmu.transpose().times(sigma.get(target).inverse().times(xmu)));            
             double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
-            double ret = constance*exp;
+            ret = constance*exp;
             System.out.println(ret);
             if (ret == Double.NaN) 
-                return 0.0D;
+                ret = 0.0D;
             if (ret == Double.POSITIVE_INFINITY) {
-                return 1.0D;
+                ret = 1.0D;
             }
-            ret= (ret>1.0D?1.0D:ret);
-            //System.out.println(ret);
-            return ret;
         } catch (Exception e) {
-            //System.err.println("asasa");
-            return 0.0D;
+            ret = 0.0D;
         }
+        ret *= (double)V.N_DATA_IN_CLASS.getOrDefault(target, 0);
+        ret= (ret>1.0D?1.0D:ret);
+        return ret;
     }
     
     public static double getMeans(Instances ins, int index) {
