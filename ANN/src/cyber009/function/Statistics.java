@@ -180,9 +180,40 @@ public class Statistics {
         return ret;
     }
     
-    public double conditionalEntropy(double target, Matrix val) {
+    public double posteriorDistribution(double target, Matrix val,
+                                        Matrix means, Matrix sd) {        
+        int k = val.getRowDimension();
+        double ret = 0.0D;
+        //System.out.println("posterior Distribution "+ k +"\n"+ val.toString());
+        Matrix xmu = val.minus(means);
+        double det = sd.det();
+        double constance = (1.0)/ (Math.sqrt(
+                                    Math.pow(2.00*Math.PI, (double)k)*
+                                    det));
+        try {
+            Matrix eM = (xmu.transpose().times(sd.inverse().times(xmu)));            
+            double exp = Math.exp((-1.0D/2.0D)*eM.get(0, 0));
+            ret = constance*exp;
+            //System.out.println(ret);
+            if (ret == Double.NaN) 
+                ret = 0.0D;
+            if (ret == Double.POSITIVE_INFINITY) {
+                ret = 1.0D;
+            }
+        } catch (Exception e) {
+            ret = 0.0D;
+        }
+        ret *= (double)V.N_DATA_IN_CLASS.getOrDefault(target, 0);
+        ret= (ret>1.0D?1.0D:ret);
+        return ret;
+    }
+    
+    
+    
+    public double conditionalEntropy(double target, Matrix val, int dataIndex) {
         Matrix means = null;
         Matrix sd = null;
+        double entropy = 0.0D;
         double [] fwData = new double[val.getRowDimension()+1];
         fwData[0] = 1.0D;
         for(int n=0; n<val.getColumnDimension(); n++) {
@@ -191,11 +222,26 @@ public class Statistics {
         Matrix [] r = calMVMuSigma(target, fwData);
         means = r[0];
         sd = r[1];
-        System.out.println("----------------\n"
-                + "W(l+"+val.toString()+"+"+target+"):\n"
-                + "means :"+means +
-                " sd:"+ sd);
-        return 0.0D;
+//        System.out.println("----------------\n"
+//                + "W(l+"+val.toString()+"+"+target+"):\n"
+//                + "means:\n"+means +
+//                " sd:\n"+ sd);
+        for(int d=0; d<V.D; d++) {
+            if(V.LABEL[d] == false && d != dataIndex ) {
+                Matrix x = new Matrix(V.N-1, 1);
+                for(int n = 0; n<V.N-1;n++) {
+                    x.set(n, 0, V.X[d][n+1]);
+                }
+                for (Double newTarget : V.CLASSES) {
+                    double pp = 
+                        posteriorDistribution(newTarget, x, means, sd);
+                    
+                    entropy += (- pp* Math.log10(pp));
+                }
+                //System.out.println("236:cal Epp:\n"+x+"epp:"+entropyPP);
+            }
+        }            
+        return entropy;
     }
     
     public static double getMeans(Instances ins, int index) {

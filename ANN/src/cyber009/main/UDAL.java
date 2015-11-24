@@ -151,8 +151,8 @@ public class UDAL {
                     for (Double target : udal.v.CLASSES) {
                         //System.out.println("-----------------------\nClass:"+ target);
                         pp += statis.posteriorDistribution(target, mVal);
-                        System.out.println("conditional: Entropy"+ 
-                                statis.conditionalEntropy(target, mVal));
+                        System.out.println("conditional: Entropy: "+ 
+                                statis.conditionalEntropy(target, mVal, d));
                     }
                     System.out.print("Sum posterior:"+ pp+ " for "+new Matrix(val).transpose());
                     
