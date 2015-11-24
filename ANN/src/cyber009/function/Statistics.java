@@ -90,7 +90,7 @@ public class Statistics {
         return ret;
     }
     
-    public void calMultiVariantMuSigma(double target) {
+    public void calMVMuSigma(double target) {
         int k = V.N-1;
         int count = 0;
         double[][] means = new double[k][1];
@@ -112,12 +112,45 @@ public class Statistics {
                     }
                 }
                 sd[r][c] = (sd[r][c]/
-                       (double)((count>0?count:1.0)));                
-                
+                       (double)((count>0?count:1.0)));
             }
         }
         mu.put(target, new Matrix(means));
         sigma.put(target, new Matrix(sd));
+    }
+    
+    public Matrix [] calMVMuSigma(double target, double [] fwData) {
+        int k = V.N-1;
+        int count = 0;
+        Matrix [] ret = new Matrix[2];
+        double[][] means = new double[k][1];
+        double [][] sd = new double[k][k];
+        for(int i=0; i<k; i++) {
+            means[i][0] = getMeans(target, fwData, i+1);
+            //System.out.println("130:("+target+") means :"+ means[i][0]);
+        }
+        
+        for(int r=0; r<k; r++) {
+            for(int c=0; c<k; c++) {
+                sd[r][c] = 0.0;
+                count = 0;
+                sd[r][c] +=( (fwData[r+1]- means[r][0])*
+                                (fwData[c+1]- means[c][0]));
+                count++;
+                for (int d=0; d<V.D; d++) {
+                    if(V.TARGET[d] == target && V.LABEL[d]==true) {
+                        sd[r][c] +=( (V.X[d][r+1]- means[r][0])*
+                                (V.X[d][c+1]- means[c][0]));
+                        count++;
+//                    System.out.println("("+V.X[d][r+1]+"-("+ means[r][0]+")) * (("+
+//                            V.X[d][c+1]+")-("+ means[c][0]+")) = "+sd[r][c]);                    
+                    }
+                }
+                sd[r][c] = (sd[r][c]/
+                       (double)((count>0?count:1.0)));
+            }
+        }
+        return new Matrix[]{new Matrix(means), new Matrix(sd)};
     }
     
     public double posteriorDistribution(double target, Matrix val) {        
@@ -148,6 +181,20 @@ public class Statistics {
     }
     
     public double conditionalEntropy(double target, Matrix val) {
+        Matrix means = null;
+        Matrix sd = null;
+        double [] fwData = new double[val.getRowDimension()+1];
+        fwData[0] = 1.0D;
+        for(int n=0; n<val.getColumnDimension(); n++) {
+            fwData[n+1] = val.get(n, 0);
+        }
+        Matrix [] r = calMVMuSigma(target, fwData);
+        means = r[0];
+        sd = r[1];
+        System.out.println("----------------\n"
+                + "W(l+"+val.toString()+"+"+target+"):\n"
+                + "means :"+means +
+                " sd:"+ sd);
         return 0.0D;
     }
     
@@ -168,6 +215,21 @@ public class Statistics {
         if(count==0) {
             return 0.0;
         }
+        sum /=(double) count;
+        return sum;
+    }
+    
+    public double getMeans(double target, double [] fwData, int index) {
+        double sum = 0.0;
+        int count = 0;
+        for(int d=0; d<V.D; d++) {
+            if(V.TARGET[d]== target && V.LABEL[d]==true) {
+                sum +=V.X[d][index];
+                count++;
+            }
+        }
+        sum += fwData[index];
+        count++;
         sum /=(double) count;
         return sum;
     }

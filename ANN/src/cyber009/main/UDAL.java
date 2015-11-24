@@ -133,7 +133,7 @@ public class UDAL {
             timeStart = System.currentTimeMillis();
             udal.ann.gradientDescent(10000L, 3, 100);
             for (Double target : udal.v.CLASSES) {
-                statis.calMultiVariantMuSigma(target);
+                statis.calMVMuSigma(target);
                 System.out.println(udal.v.N_DATA_IN_CLASS.get(target));
                 System.out.println(statis.mu.get(target));
                 System.out.println(statis.sigma.get(target));
@@ -146,10 +146,13 @@ public class UDAL {
 //                        System.out.print(udal.v.X[d][n] + "   ");
 //                        System.out.println(val[n-1][0]);
                     }
+                    Matrix mVal = new Matrix(val);
                     double pp = 0.0D;
                     for (Double target : udal.v.CLASSES) {
                         //System.out.println("-----------------------\nClass:"+ target);
-                        pp += statis.posteriorDistribution(target, new Matrix(val));
+                        pp += statis.posteriorDistribution(target, mVal);
+                        System.out.println("conditional: Entropy"+ 
+                                statis.conditionalEntropy(target, mVal));
                     }
                     System.out.print("Sum posterior:"+ pp+ " for "+new Matrix(val).transpose());
                     
