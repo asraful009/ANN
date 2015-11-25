@@ -20,6 +20,7 @@ public class Variable {
     public double [][] X;
     public double [] WEIGHT;
     public double [] TARGET;
+    public double [] X_FL;
     public boolean [] LABEL;
     public List<Double> CLASSES;    
     public HashMap<Double, Integer> N_DATA_IN_CLASS;

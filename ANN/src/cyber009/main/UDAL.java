@@ -32,12 +32,19 @@ public class UDAL {
     Random r;
     Variable v;
     ANN ann;
+    int [] MinQueue;
+    int MINQUEUESIZE;
     cyber009.function.LinearFunction func;
     
-    public UDAL(double learnRate) {
+    public UDAL(double learnRate, int MINQUEUESIZE) {
         r = new Random(System.currentTimeMillis());
         v = new Variable();
         ann = new ANN(v, learnRate);//0.014013);
+        MinQueue = new int[MINQUEUESIZE];
+        this.MINQUEUESIZE = MINQUEUESIZE;
+        for(int q = 0; q<MINQUEUESIZE; q++) {
+            MinQueue[q] =-1; 
+        }
     }
     
     public void initUDAL(int f, int D) {
@@ -47,9 +54,11 @@ public class UDAL {
         func = new cyber009.function.LinearFunction(v.N);
         v.X = new double[v.D][];
         v.TARGET = new double[v.D];
+        v.X_FL = new double[v.D];
         v.WEIGHT = new double[v.N+1];
         v.LABEL = new boolean[D+1];
         for(int d=0; d<v.D; d++) {
+            v.X_FL[d] = Double.MAX_VALUE;
             v.X[d] = new double[v.N+1];
             v.X[d][0] = 1.0;
             for(int n=1; n<=v.N; n++) {
@@ -122,12 +131,33 @@ public class UDAL {
 
     }
     
-    public static void main(String[] args) {        
-        UDAL udal = new UDAL(0.014013);
+    public void addToMinQueue(int index) {
+        int j=0;
+        int temp = -1;
+        for(j= MINQUEUESIZE-1; j >=0; j--) {
+            if(MinQueue[j] != -1) {
+                if(v.X_FL[MinQueue[j]] > v.X_FL[index]) {
+                    if(j != MINQUEUESIZE -1) {
+                        MinQueue[j+1] = MinQueue[j];
+                    }
+                } else {
+                    break;
+                }
+            }
+            temp = j;
+        }
+        if(temp != -1) {
+            MinQueue[temp] = index;
+        }
+    }
+    
+    public static void main(String[] args) { 
+        double min = Double.MAX_VALUE;
+        UDAL udal = new UDAL(0.014013, 100);
         Statistics statis = new Statistics(udal.v);
         long timeStart=0, timeEnd=0;
         for(int f=2; f<=2; f++) {
-            udal.initUDAL(4, 4000);
+            udal.initUDAL(4, 400);
             udal.activeLearning(0, 100);
             udal.ann.weightReset();
             timeStart = System.currentTimeMillis();
@@ -138,6 +168,7 @@ public class UDAL {
                 System.out.println(statis.mu.get(target));
                 System.out.println(statis.sigma.get(target));
             }
+            double pp =0.0D;
             for(int d=0; d<udal.v.D; d++) {
                 if(udal.v.LABEL[d] == false) {
                     double [][] val = new double[udal.v.N-1][1];
@@ -147,17 +178,20 @@ public class UDAL {
 //                        System.out.println(val[n-1][0]);
                     }
                     Matrix mVal = new Matrix(val);
-                    double pp = 0.0D;
+                    pp = 0.0D;
                     for (Double target : udal.v.CLASSES) {
                         //System.out.println("-----------------------\nClass:"+ target);
-                        pp += statis.posteriorDistribution(target, mVal);
-                        System.out.println("conditional: Entropy: "+ 
+                        pp += (statis.posteriorDistribution(target, mVal)*
                                 statis.conditionalEntropy(target, mVal, d));
                     }
-                    System.out.print("Sum posterior:"+ pp+ " for "+new Matrix(val).transpose());
-                    
+                    udal.v.X_FL[d] = pp;
+                    udal.addToMinQueue(d);
+                    //System.out.println("x["+ d +"] :"+ pp);                  
                 }
             }
+            System.out.println("min values");
+            for(int q = 0; q<udal.MINQUEUESIZE; q++) 
+                System.out.println(udal.MinQueue[q] + " = " + udal.v.X_FL[udal.MinQueue[q]] );
             System.out.println("-----------------------");
             timeEnd = System.currentTimeMillis();
             System.out.println("feature #:"+udal.v.N+" time:("+ (timeEnd - timeStart) +")");
